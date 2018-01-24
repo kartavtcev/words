@@ -4,7 +4,7 @@ words test
 
 Oracle VM VirtualBox, guest OS Ubuntu 17.10, 64-bit.
 
-Tech stack: Spark Notebook (Spark), Scala, OpenNLP, Jackson Json.
+Tech stack: Spark Notebook (SN v 0.9.0, Scala 2.11.8, Spark 2.1.0, Hadoop 2.7.2 with Hive), Scala, OpenNLP, Jackson Json.
 
 Code organized to NLP, OpenNLP classes.
 Accompanying objects NLP, OpenNLP do IO, store consts. (TODO: IO monad)
