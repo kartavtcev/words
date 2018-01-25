@@ -48,13 +48,13 @@ import spark.implicits._
 object NLP { 
   
   case class Keyword(
-    @JsonProperty("keyword")@JsonProperty(required = true) keyword: String,
-    @JsonProperty("value")@JsonProperty(required = true) value: Double
+    keyword: String,
+    value: Double
   )
   case class TfIdfFile(
-    @JsonProperty("filename")@JsonProperty(required = true) filename: String,
-    @JsonProperty("language")@JsonProperty(required = true) language:String,
-    @JsonProperty("keywords")@JsonProperty(required = true) features : Seq[Keyword]
+    filename: String,
+    language:String,
+    @JsonProperty("keywords") features : Seq[Keyword]
   )
   case class ProcessedFile(
     filename: String,
@@ -129,7 +129,7 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
             val tokensExcludeStopWords = removeStopWords(lang, tokens, stopwordsPerLang)
 
             val lemmas = onlp.lemmatize(tokensExcludeStopWords)
-            val lemmd = (tokensExcludeStopWords zip lemmas) map (tuple => if(tuple._2 != "O") tuple._2 else tuple._1 ) // if no lemma => original
+            val lemmd = (tokensExcludeStopWords zip lemmas) map { case (t,l) => if(l != "O") l else t } // if no lemma => original
             (lang,path.split("/").takeRight(1).head,lemmd.toArray)
           }}
         val df = spark.createDataFrame(ls).toDF("language", "filename", "tokens") 
@@ -159,12 +159,12 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
                     .map { case Row(filename: String, tokens: WrappedArray[String]) => (filename, tokens.toSeq)}
                     .collect().toSeq
                                
-        Right((pfs.map(pf => NLP.ProcessedFile(pf._1, pf._2))),
-               tis.map( ti =>
-                 NLP.TfIdfFile(ti._1._1, ti._1._2, ti._2.zipWithIndex
+      Right((pfs.map { case (filename, tokens) => NLP.ProcessedFile(filename, tokens)}),
+            tis.map { case ((filename, language), features) =>
+                 NLP.TfIdfFile(filename, language, features.zipWithIndex
                                                               .sortBy(- _._1)
                                                               .take(NLP.numOfTopWords)
-                                                              .map(f => NLP.Keyword(vocabulary(f._2), f._1)))))
+                                                              .map{ case (value, index) => NLP.Keyword(vocabulary(index), value)}) })
            
     } toSeq
   }
@@ -204,7 +204,7 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
   def detectLang(line : String, stopwordsPerLang : MapLangToStrings) : Option[String] = {
     val langs = line.split(" ").flatMap(item => stopwordsPerLang.filter(_._2.exists(_.equalsIgnoreCase(item))).map(_._1))
                     .groupBy(f => f)
-                    .map(g => (g._1, g._2.size))
+                    .map{ case (l,ls) => (l, ls.size)}
     if(langs.isEmpty) None
     else Some(langs.maxBy(_._2)._1)
   } 
