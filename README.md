@@ -8,7 +8,7 @@ Tech stack: Spark Notebook (SN v 0.9.0, Scala 2.11.8, Spark 2.1.0, Hadoop 2.7.2 
 
 Code organized to NLP, OpenNLP classes.
 Accompanying objects: NLP, OpenNLP do IO, store consts. (TODO: IO monad)
-Code in classes built in immutable way without side-effects.
+Code in classes built in immutable way to minimize side-effects.
 
 TODO: replace java.io with java.nio for concurrent IO.
 
