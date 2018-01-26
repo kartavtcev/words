@@ -25,9 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 def using[A <: { def close(): Unit }, B](resource: A)(f: A => B): B =
   try {
       f(resource)
-  } catch {
-      case _ : Throwable => throw new Exception("file exception")
-  } finally {
+  } /* catch { case e: Exception => throw e  } */
+  finally {
       resource.close()
   }
 
@@ -129,10 +128,11 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
             val tokensExcludeStopWords = removeStopWords(lang, tokens, stopwordsPerLang)
 
             val lemmas = onlp.lemmatize(tokensExcludeStopWords)
-            val lemmd = (tokensExcludeStopWords zip lemmas) map { case (t,l) => if(l != "O") l else t } // if no lemma => original
+            val lemmd = (tokensExcludeStopWords zip lemmas) map { case (t,l) => if(l != "O" && l != "--") l else t } // if no lemma => original
             (lang,path.split("/").takeRight(1).head,lemmd.toArray)
           }}
         val df = spark.createDataFrame(ls).toDF("language", "filename", "tokens") 
+
         val tf = new CountVectorizer()
               .setInputCol("tokens")
               .setOutputCol("tf")        
@@ -176,6 +176,7 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
     // https://stackoverflow.com/questions/6198986/how-can-i-replace-non-printable-unicode-characters-in-java
     val removedUnicodes = removedWordsOfSizeLessEqual2AndPunctuation.replaceAll("""[\p{C}]""", " ")
     val replacedEscapeSeqWithSpace =  removedUnicodes.replaceAll("""[\t\n\r\f\v]""", " ")
+    // "Clean it all": replaceAll("""[^A-Za-z]""", " ")
     replacedEscapeSeqWithSpace
   }
 

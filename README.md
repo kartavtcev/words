@@ -12,4 +12,4 @@ Code in classes built in immutable way without side-effects.
 
 TODO: replace java.io with java.nio for concurrent IO.
 
-Spark Notebook feedback: SN makes it hard to debug internal Spark framework errors with objects serialization, lacks lines numbers, code navigation, etc; also SN has internal JSON structure of .snb files. Which prevents SN from being the first choice in development. IDE with deployed Spark must be more convenient, have better developer productivity.
+Spark Notebook feedback: SN fits best select(), show() prototyping. SN makes it hard to debug internal Spark framework errors with objects serialization, lacks lines numbers, code navigation, etc; also SN has internal JSON structure of .snb files. Above prevents SN from being the first choice in development. IDE with deployed Spark must be more convenient, have better developer productivity.
