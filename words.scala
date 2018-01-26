@@ -25,8 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 def using[A <: { def close(): Unit }, B](resource: A)(f: A => B): B =
   try {
       f(resource)
-  } /* catch { case e: Exception => throw e  } */
-  finally {
+  } finally {
       resource.close()
   }
 
