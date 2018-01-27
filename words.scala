@@ -147,7 +147,7 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
         val cvModel = pipelineModel.stages(0).asInstanceOf[CountVectorizerModel]      
         val vocabulary = cvModel.vocabulary
                                              
-        val tis = tfidf.select("filename", "language", "features")
+        val tis = tfidf.select("filename", "language", "tfidf")
                        .map { case Row(filename: String, language: String, features: Vector) => ((filename, language), features.toArray.toSeq)}        
                        .collect().toSeq
         val pfs = df.select("filename", "tokens")                                             
