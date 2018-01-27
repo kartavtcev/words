@@ -139,12 +139,8 @@ class NLP(val stopwordsPerLang: MapLangToStrings, val textfilesPaths: Seq[String
         val idf = new IDF()
               .setInputCol("tf")
               .setOutputCol("tfidf")
-        
-        val va = new VectorAssembler()
-              .setInputCols(Array("tfidf"))
-              .setOutputCol("features")
                                              
-        val tfidfPipeline = new Pipeline().setStages(Array(tf, idf, va))
+        val tfidfPipeline = new Pipeline().setStages(Array(tf, idf))
         val pipelineModel = tfidfPipeline.fit(df)
         val tfidf =  pipelineModel.transform(df)
         
